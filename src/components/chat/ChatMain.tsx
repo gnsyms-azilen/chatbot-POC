@@ -75,7 +75,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
 
       {/* Input Area */}
       <div className="border-t border-secondary-200 p-6">
-        <form onSubmit={handleSubmit} className="flex items-end gap-4">
+        <form onSubmit={handleSubmit} className="flex items-center gap-4">
           <div className="flex-1 relative">
             <textarea
               value={inputValue}
@@ -118,9 +118,9 @@ const ChatMain: React.FC<ChatMainProps> = ({
           </button>
         </form>
         
-        <p className="text-xs text-secondary-500 mt-2 text-center">
+        {/* <p className="text-xs text-secondary-500 mt-2 text-center">
           Press Enter to send, Shift+Enter for new line
-        </p>
+        </p> */}
       </div>
     </div>
   );
