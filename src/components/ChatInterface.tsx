@@ -26,6 +26,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   const [isLoading, setIsLoading] = useState(false);
   const [currentTopic, setCurrentTopic] = useState('Tax Questions');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -37,7 +38,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   }, [messages]);
 
   useEffect(() => {
-    if (initialQuery) {
+    if (initialQuery && !hasProcessedInitialQuery) {
+      setHasProcessedInitialQuery(true);
       handleSendMessage(initialQuery);
     }
   }, [initialQuery]);
@@ -52,6 +54,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
 
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
+
+    // Update topic based on first few words of the message
+    if (messages.length === 0) {
+      const topic = content.split(' ').slice(0, 3).join(' ');
+      setCurrentTopic(topic.length > 20 ? topic.substring(0, 20) + '...' : topic);
+    }
 
     // Simulate AI response
     setTimeout(() => {
@@ -92,6 +100,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     return "Thank you for your question! I'd be happy to help you with tax and finance guidance. Based on official IRS publications and current tax regulations, I can provide you with accurate information tailored to your specific situation.\n\nCould you provide a bit more detail about your specific circumstances so I can give you the most relevant advice?";
   };
 
+  const handleNewChat = () => {
+    setMessages([]);
+    setCurrentTopic('Tax Questions');
+    setHasProcessedInitialQuery(false);
+    onBackToLanding();
+  };
+
   const mockChatHistory = [
     { id: '1', title: 'Freelancer Deductions', timestamp: new Date('2024-01-15'), category: '2024 Tax Year' },
     { id: '2', title: 'Quarterly Payments', timestamp: new Date('2024-01-10'), category: '2024 Tax Year' },
@@ -103,7 +118,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     <div className="h-screen flex flex-col bg-secondary-50">
       <ChatHeader 
         currentTopic={currentTopic}
-        onNewChat={onBackToLanding}
+        onNewChat={handleNewChat}
         onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       />
       
