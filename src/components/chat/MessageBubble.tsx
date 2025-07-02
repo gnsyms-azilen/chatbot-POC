@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Copy, FileText, Share, ThumbsUp, ThumbsDown, User, Bot } from 'lucide-react';
+import { SERVICES } from './ServiceFilter';
 
 interface Message {
   id: string;
   content: string;
   isUser: boolean;
   timestamp: Date;
+  services?: string[];
   sources?: Array<{
     title: string;
     url: string;
@@ -66,12 +68,39 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const getServiceBadges = () => {
+    if (!message.services || message.services.length === 0) return null;
+    
+    return message.services.map(serviceId => {
+      const service = SERVICES.find(s => s.id === serviceId);
+      if (!service) return null;
+      
+      const IconComponent = service.icon;
+      return (
+        <div
+          key={serviceId}
+          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border ${service.color}`}
+        >
+          <IconComponent className="w-3 h-3" />
+          <span>{service.name}</span>
+        </div>
+      );
+    });
+  };
+
   if (message.isUser) {
     return (
       <div className="flex justify-end">
         <div className="max-w-2xl">
           <div className="flex items-start gap-3 justify-end">
             <div className="flex-1">
+              {/* Service badges for user messages */}
+              {message.services && message.services.length > 0 && (
+                <div className="flex flex-wrap gap-2 justify-end mb-2">
+                  {getServiceBadges()}
+                </div>
+              )}
+              
               <div className="bg-primary-600 text-white p-4 rounded-2xl rounded-tr-md shadow-sm">
                 <p className="whitespace-pre-wrap">{displayedContent}</p>
               </div>
@@ -99,6 +128,16 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
           </div>
           
           <div className="flex-1">
+            {/* Service context indicator */}
+            {message.services && message.services.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                <div className="text-xs text-secondary-500 font-medium">
+                  Response contextualized for:
+                </div>
+                {getServiceBadges()}
+              </div>
+            )}
+            
             <div className="bg-secondary-50 p-4 rounded-2xl rounded-tl-md shadow-sm">
               <p className="whitespace-pre-wrap text-secondary-800">
                 {displayedContent}

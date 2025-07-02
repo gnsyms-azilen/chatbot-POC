@@ -3,12 +3,14 @@ import ChatHeader from './chat/ChatHeader';
 import ChatSidebar from './chat/ChatSidebar';
 import ChatMain from './chat/ChatMain';
 import SourcesSidebar from './chat/SourcesSidebar';
+import { SERVICES } from './chat/ServiceFilter';
 
 interface Message {
   id: string;
   content: string;
   isUser: boolean;
   timestamp: Date;
+  services?: string[];
   sources?: Array<{
     title: string;
     url: string;
@@ -20,7 +22,6 @@ interface ChatInterfaceProps {
   initialQuery: string;
   onBackToLanding: () => void;
 }
-
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLanding }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -37,6 +38,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     bg-white border-l border-secondary-200
     flex flex-col h-full
   `;
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -48,17 +50,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   useEffect(() => {
     if (initialQuery && !hasProcessedInitialQuery) {
       setHasProcessedInitialQuery(true);
-      handleSendMessage(initialQuery);
+      handleSendMessage(initialQuery, []);
     }
   }, [initialQuery]);
 
-
-  const handleSendMessage = async (content: string) => {
+  const handleSendMessage = async (content: string, services: string[]) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       content,
       isUser: true,
       timestamp: new Date(),
+      services: services.length > 0 ? services : undefined,
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -74,9 +76,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     setTimeout(() => {
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: generateBotResponse(content),
+        content: generateBotResponse(content, services),
         isUser: false,
         timestamp: new Date(),
+        services: services.length > 0 ? services : undefined,
         sources: [
           {
             title: "IRS Publication 535 - Business Expenses",
@@ -96,17 +99,36 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     }, 1500);
   };
 
-  const generateBotResponse = (query: string): string => {
-    // Simple response generation for demo
-    if (query.toLowerCase().includes('deduction')) {
-      return "Based on current IRS regulations, there are several deductions you may be eligible for. For freelancers and self-employed individuals, you can typically deduct business expenses such as home office costs (if you use part of your home exclusively for business), equipment purchases, professional development courses, and business-related travel expenses.\n\nThe key requirement is that these expenses must be both ordinary and necessary for your business. Keep detailed records and receipts for all claimed deductions. For home office deductions, you can use either the simplified method ($5 per square foot, up to 300 sq ft) or the actual expense method.\n\nWould you like me to explain any specific deduction category in more detail?";
-    }
+  const generateBotResponse = (query: string, services: string[]): string => {
+    let contextPrefix = '';
     
-    if (query.toLowerCase().includes('quarterly')) {
-      return "Quarterly estimated taxes are due four times per year for self-employed individuals and those who don't have taxes withheld from their income. The due dates are typically January 15, April 15, June 15, and September 15.\n\nTo calculate your quarterly payments:\n1. Estimate your annual income\n2. Calculate expected tax liability\n3. Subtract any withholdings or credits\n4. Divide by 4 for quarterly amounts\n\nYou can use Form 1040ES to help with calculations. The general rule is to pay either 90% of the current year's tax liability or 100% of last year's tax (110% if your prior year AGI exceeded $150,000).\n\nWould you like help calculating your specific quarterly payment amount?";
+    if (services.length > 0) {
+      const serviceNames = services.map(id => {
+        const service = SERVICES.find(s => s.id === id);
+        return service?.name;
+      }).filter(Boolean);
+      
+      if (serviceNames.length === 1) {
+        contextPrefix = `For ${serviceNames[0]} specifically: `;
+      } else if (serviceNames.length > 1) {
+        contextPrefix = `For ${serviceNames.slice(0, -1).join(', ')} and ${serviceNames[serviceNames.length - 1]}: `;
+      }
     }
 
-    return "Thank you for your question! I'd be happy to help you with tax and finance guidance. Based on official IRS publications and current tax regulations, I can provide you with accurate information tailored to your specific situation.\n\nCould you provide a bit more detail about your specific circumstances so I can give you the most relevant advice?";
+    // Service-specific responses
+    if (services.includes('deductions') || query.toLowerCase().includes('deduction')) {
+      return contextPrefix + "Based on current IRS regulations, there are several deductions you may be eligible for. For freelancers and self-employed individuals, you can typically deduct business expenses such as home office costs (if you use part of your home exclusively for business), equipment purchases, professional development courses, and business-related travel expenses.\n\nThe key requirement is that these expenses must be both ordinary and necessary for your business. Keep detailed records and receipts for all claimed deductions. For home office deductions, you can use either the simplified method ($5 per square foot, up to 300 sq ft) or the actual expense method.\n\nWould you like me to explain any specific deduction category in more detail?";
+    }
+    
+    if (services.includes('self-employed') || query.toLowerCase().includes('quarterly')) {
+      return contextPrefix + "Quarterly estimated taxes are due four times per year for self-employed individuals and those who don't have taxes withheld from their income. The due dates are typically January 15, April 15, June 15, and September 15.\n\nTo calculate your quarterly payments:\n1. Estimate your annual income\n2. Calculate expected tax liability\n3. Subtract any withholdings or credits\n4. Divide by 4 for quarterly amounts\n\nYou can use Form 1040ES to help with calculations. The general rule is to pay either 90% of the current year's tax liability or 100% of last year's tax (110% if your prior year AGI exceeded $150,000).\n\nWould you like help calculating your specific quarterly payment amount?";
+    }
+
+    if (services.includes('business-tax')) {
+      return contextPrefix + "For business tax matters, there are several key areas to consider. Business expenses must be ordinary and necessary to be deductible. Common deductible expenses include office supplies, equipment, professional services, marketing costs, and business travel.\n\nDepending on your business structure (sole proprietorship, LLC, corporation), you'll file different forms and may have different tax obligations. Corporations file Form 1120, while sole proprietors report business income on Schedule C of their personal return.\n\nKeep meticulous records of all business transactions, as the IRS may request documentation during an audit. Consider working with a tax professional for complex business situations.\n\nWhat specific aspect of business taxation would you like to explore further?";
+    }
+
+    return contextPrefix + "Thank you for your question! I'd be happy to help you with tax and finance guidance. Based on official IRS publications and current tax regulations, I can provide you with accurate information tailored to your specific situation.\n\nCould you provide a bit more detail about your specific circumstances so I can give you the most relevant advice?";
   };
 
   const handleNewChat = () => {
@@ -130,6 +152,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   const toggleSources = useCallback(() => {
     setShowSources(prev => !prev);
   }, []);
+
   return (
     <div className="h-screen flex flex-col bg-secondary-50">
       <ChatHeader 
@@ -154,10 +177,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
             toggleSources={toggleSources}
           />
           <div className={sourcesClasses}>
-          <SourcesSidebar 
-            toggleSources={toggleSources}
-            sources={messages.filter(m => !m.isUser && m.sources).flatMap(m => m.sources || [])}
-          />
+            <SourcesSidebar 
+              toggleSources={toggleSources}
+              sources={messages.filter(m => !m.isUser && m.sources).flatMap(m => m.sources || [])}
+            />
           </div>
         </div>
       </div>

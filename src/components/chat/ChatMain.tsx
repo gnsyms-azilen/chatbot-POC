@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Send, Mic } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import LoadingDots from './LoadingDots';
+import ServiceFilter, { SERVICES } from './ServiceFilter';
 
 interface Message {
   id: string;
   content: string;
   isUser: boolean;
   timestamp: Date;
+  services?: string[];
   sources?: Array<{
     title: string;
     url: string;
@@ -18,7 +20,7 @@ interface Message {
 interface ChatMainProps {
   messages: Message[];
   isLoading: boolean;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, services: string[]) => void;
   toggleSources: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
@@ -32,11 +34,12 @@ const ChatMain: React.FC<ChatMainProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputValue.trim() && !isLoading) {
-      onSendMessage(inputValue.trim());
+      onSendMessage(inputValue.trim(), selectedServices);
       setInputValue('');
     }
   };
@@ -44,6 +47,22 @@ const ChatMain: React.FC<ChatMainProps> = ({
   const handleVoiceInput = () => {
     setIsListening(!isListening);
     // Voice input implementation would go here
+  };
+
+  const getServiceContext = () => {
+    if (selectedServices.length === 0) return '';
+    
+    const serviceNames = selectedServices.map(id => {
+      const service = SERVICES.find(s => s.id === id);
+      return service?.name;
+    }).filter(Boolean);
+
+    if (serviceNames.length === 1) {
+      return `(${serviceNames[0]} specific)`;
+    } else if (serviceNames.length > 1) {
+      return `(${serviceNames.join(', ')} specific)`;
+    }
+    return '';
   };
 
   return (
@@ -76,13 +95,20 @@ const ChatMain: React.FC<ChatMainProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-secondary-200 p-6">
+      <div className="border-t border-secondary-200 p-6 space-y-4">
+        {/* Service Filter */}
+        <ServiceFilter
+          selectedServices={selectedServices}
+          onServicesChange={setSelectedServices}
+        />
+
+        {/* Input Form */}
         <form onSubmit={handleSubmit} className="flex items-center gap-4">
           <div className="flex-1 relative">
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Ask a follow-up question..."
+              placeholder={`Ask a follow-up question... ${getServiceContext()}`}
               className="w-full px-4 py-3 pr-12 border border-secondary-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent max-h-32 text-secondary-800"
               rows={1}
               onInput={(e) => {
@@ -119,10 +145,6 @@ const ChatMain: React.FC<ChatMainProps> = ({
             <Send className="w-5 h-5" />
           </button>
         </form>
-        
-        {/* <p className="text-xs text-secondary-500 mt-2 text-center">
-          Press Enter to send, Shift+Enter for new line
-        </p> */}
       </div>
     </div>
   );

@@ -1,25 +1,42 @@
 import React, { useState } from 'react';
 import { Mic, Send, Bot } from 'lucide-react';
+import ServiceFilter from './chat/ServiceFilter';
 
 interface LandingPageProps {
-  onStartChat: (query: string) => void;
+  onStartChat: (query: string, services?: string[]) => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      onStartChat(query.trim());
+      onStartChat(query.trim(), selectedServices);
     }
   };
 
   const handleVoiceInput = () => {
     setIsListening(!isListening);
     // Voice input would be implemented here
+  };
+
+  const handleQuickStart = (suggestion: string) => {
+    // Auto-select relevant services based on the suggestion
+    let autoServices: string[] = [];
+    
+    if (suggestion.includes('freelancer')) {
+      autoServices = ['self-employed', 'deductions'];
+    } else if (suggestion.includes('quarterly')) {
+      autoServices = ['self-employed', 'payments'];
+    } else if (suggestion.includes('deductions')) {
+      autoServices = ['deductions'];
+    }
+    
+    onStartChat(suggestion, autoServices);
   };
 
   const maxChars = 200;
@@ -47,7 +64,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
         </div>
 
         {/* Search Interface */}
-        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto mb-8">
+        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto mb-8 space-y-4">
+          {/* Service Filter */}
+          <ServiceFilter
+            selectedServices={selectedServices}
+            onServicesChange={setSelectedServices}
+          />
+
+          {/* Query Input */}
           <div className={`relative group transition-all duration-300 ${
             isFocused ? 'transform scale-[1.02]' : ''
           }`}>
@@ -117,7 +141,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
         </form>
 
         {/* Quick Start Options */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-16">
           {[
             "What tax deductions can I claim as a freelancer?",
             "How do I calculate quarterly estimated taxes?",
@@ -125,7 +149,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
           ].map((suggestion, index) => (
             <button
               key={index}
-              onClick={() => onStartChat(suggestion)}
+              onClick={() => handleQuickStart(suggestion)}
               className="p-4 bg-white rounded-xl border border-secondary-200 text-left hover:border-primary-300 hover:shadow-md transition-all duration-200 group"
             >
               <p className="text-secondary-700 group-hover:text-primary-600 transition-colors duration-200">
@@ -136,7 +160,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
         </div>
 
         {/* Features */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {[
             {
               title: "IRS-Verified Data",
