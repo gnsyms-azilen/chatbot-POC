@@ -51,17 +51,6 @@ const SourcesSidebar: React.FC<SourcesSidebarProps> = ({ sources, isOpen, onClos
         />
       )}
 
-      {/* Collapsed State for Desktop */}
-      <div className={`max-md:hidden ${animation} ${!isOpen ? 'w-16 opacity-100' : 'w-0 opacity-0'} flex flex-col h-full border-l bg-white border-secondary-200`}>
-        <button
-          onClick={onClose}
-          className="py-2 text-secondary-600 hover:text-secondary-800 flex justify-center"
-          title="Show sources"
-        >
-          <Shield className="w-5 h-5" />
-        </button>
-      </div>
-
       {/* Full Sidebar */}
       <div className={sidebarClasses}>
         {/* Header */}
