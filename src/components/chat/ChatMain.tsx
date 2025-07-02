@@ -19,6 +19,7 @@ interface ChatMainProps {
   messages: Message[];
   isLoading: boolean;
   onSendMessage: (message: string) => void;
+  toggleSources: () => void;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
@@ -26,6 +27,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
   messages, 
   isLoading, 
   onSendMessage, 
+  toggleSources,
   messagesEndRef 
 }) => {
   const [inputValue, setInputValue] = useState('');
@@ -65,7 +67,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
         )}
 
         {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} />
+          <MessageBubble key={message.id} message={message} toggleSources={toggleSources} />
         ))}
 
         {isLoading && <LoadingDots />}

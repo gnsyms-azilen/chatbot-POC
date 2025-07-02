@@ -15,9 +15,10 @@ interface Message {
 
 interface MessageBubbleProps {
   message: Message;
+  toggleSources: () => void;
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [isTyping, setIsTyping] = useState(!message.isUser);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
@@ -121,9 +122,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
                   </button>
                   
                   <button
-                    onClick={() => {}}
+                    onClick={toggleSources}
                     className="p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
-                    title="Export as PDF"
+                    title="Sources & References"
                   >
                     <FileText className="w-4 h-4" />
                   </button>

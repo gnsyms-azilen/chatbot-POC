@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, ChevronDown, ChevronUp, Shield } from 'lucide-react';
+import { ExternalLink, ChevronDown, ChevronUp, Shield, SidebarOpenIcon } from 'lucide-react';
 
 interface Source {
   title: string;
@@ -9,9 +9,10 @@ interface Source {
 
 interface SourcesSidebarProps {
   sources: Source[];
+  toggleSources: () => void; 
 }
 
-const SourcesSidebar: React.FC<SourcesSidebarProps> = ({ sources }) => {
+const SourcesSidebar: React.FC<SourcesSidebarProps> = ({ sources, toggleSources }) => {
   const [expandedSources, setExpandedSources] = useState<Set<number>>(new Set());
 
   const toggleSource = (index: number) => {
@@ -29,18 +30,27 @@ const SourcesSidebar: React.FC<SourcesSidebarProps> = ({ sources }) => {
   };
 
   return (
-    <div className="w-80 bg-white border-l border-secondary-200 flex flex-col h-full hidden lg:flex">
+    <div className="w-80 bg-white border-l border-secondary-200 flex flex-col h-full max-md:hidden">
       {/* Header */}
-      <div className="p-6 border-b border-secondary-200">
+      <div className="flex gap-4 p-6 border-b border-secondary-200">
+
+        <div>
         <div className="flex items-center gap-2 mb-2">
           <Shield className="w-5 h-5 text-primary-600" />
           <h3 className="text-lg font-semibold text-secondary-800">
             Sources & References
           </h3>
         </div>
-        <p className="text-sm text-secondary-600">
+        <p className="text-sm text-center text-secondary-600">
           All responses are backed by official documentation
         </p>
+        </div>
+        <button
+            onClick={toggleSources}
+            className=" p-1 text-secondary-600 hover:text-secondary-800 "
+          >
+            <SidebarOpenIcon className="w-5 h-5 text-red-400" />
+          </button>
       </div>
 
       {/* Sources List */}

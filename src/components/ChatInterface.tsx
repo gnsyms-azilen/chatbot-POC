@@ -21,14 +21,22 @@ interface ChatInterfaceProps {
   onBackToLanding: () => void;
 }
 
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLanding }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentTopic, setCurrentTopic] = useState('Tax Questions');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
+  const [showSources, setShowSources] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const sourcesClasses = `
+    ${showSources ? 'w-80' : 'w-0'}
+    transition-width duration-300 ease-in-out
+    bg-white border-l border-secondary-200
+    flex flex-col h-full
+  `;
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -43,6 +51,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
       handleSendMessage(initialQuery);
     }
   }, [initialQuery]);
+
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
@@ -117,7 +126,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   const toggleHistory = useCallback(() => {
     setIsMobileMenuOpen(prev => !prev);
   }, []);
-  
+
+  const toggleSources = useCallback(() => {
+    setShowSources(prev => !prev);
+  }, []);
   return (
     <div className="h-screen flex flex-col bg-secondary-50">
       <ChatHeader 
@@ -139,11 +151,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
             isLoading={isLoading}
             onSendMessage={handleSendMessage}
             messagesEndRef={messagesEndRef}
+            toggleSources={toggleSources}
           />
-          
+          <div className={sourcesClasses}>
           <SourcesSidebar 
+            toggleSources={toggleSources}
             sources={messages.filter(m => !m.isUser && m.sources).flatMap(m => m.sources || [])}
           />
+          </div>
         </div>
       </div>
     </div>
