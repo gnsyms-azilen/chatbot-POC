@@ -29,15 +29,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   const [currentTopic, setCurrentTopic] = useState('Tax Questions');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [hasProcessedInitialQuery, setHasProcessedInitialQuery] = useState(false);
-  const [showSources, setShowSources] = useState(true);
+  const [showSources, setShowSources] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const sourcesClasses = `
-    ${showSources ? 'w-72' : 'w-0'}
-    transition-width duration-300 ease-in-out
-    bg-white border-l border-secondary-200
-    flex flex-col h-full
-  `;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -84,12 +77,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
           {
             title: "IRS Publication 535 - Business Expenses",
             url: "https://www.irs.gov/pub/irs-pdf/p535.pdf",
-            description: "Official IRS guidance on business expense deductions"
+            description: "Official IRS guidance on business expense deductions and requirements for claiming them on your tax return."
           },
           {
-            title: "Tax Code Section 162",
+            title: "Tax Code Section 162 - Trade or Business Expenses",
             url: "https://www.law.cornell.edu/uscode/text/26/162",
-            description: "Legal framework for business expense deductions"
+            description: "Legal framework defining ordinary and necessary business expenses that are deductible under federal tax law."
+          },
+          {
+            title: "IRS Form 1040 Instructions",
+            url: "https://www.irs.gov/forms-pubs/about-form-1040",
+            description: "Comprehensive instructions for filing individual income tax returns, including deduction guidelines."
           }
         ]
       };
@@ -135,6 +133,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     setMessages([]);
     setCurrentTopic('Tax Questions');
     setHasProcessedInitialQuery(false);
+    setShowSources(false);
     // Don't navigate back to landing page - stay in chat interface
   };
 
@@ -176,12 +175,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
             messagesEndRef={messagesEndRef}
             toggleSources={toggleSources}
           />
-          <div className={sourcesClasses}>
-            <SourcesSidebar 
-              toggleSources={toggleSources}
-              sources={messages.filter(m => !m.isUser && m.sources).flatMap(m => m.sources || [])}
-            />
-          </div>
+          <SourcesSidebar 
+            sources={messages.filter(m => !m.isUser && m.sources).flatMap(m => m.sources || [])}
+            isOpen={showSources}
+            onClose={toggleSources}
+          />
         </div>
       </div>
     </div>
