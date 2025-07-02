@@ -33,7 +33,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const sourcesClasses = `
-    ${showSources ? 'w-80' : 'w-0'}
+    ${showSources ? 'w-72' : 'w-0'}
     transition-width duration-300 ease-in-out
     bg-white border-l border-secondary-200
     flex flex-col h-full

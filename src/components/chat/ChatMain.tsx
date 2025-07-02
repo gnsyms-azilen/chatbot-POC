@@ -69,17 +69,17 @@ const ChatMain: React.FC<ChatMainProps> = ({
   return (
     <div className="flex-1 flex flex-col bg-white">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && !isLoading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center max-w-md mx-auto">
-              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Send className="w-8 h-8 text-primary-600" />
+              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Send className="w-6 h-6 text-primary-600" />
               </div>
-              <h3 className="text-lg font-semibold text-secondary-800 mb-2">
+              <h3 className="text-base font-semibold text-secondary-800 mb-1">
                 Ready to help with your tax questions
               </h3>
-              <p className="text-secondary-600">
+              <p className="text-sm text-secondary-600">
                 Ask me anything about taxes, deductions, filing requirements, or financial planning.
               </p>
             </div>
@@ -96,7 +96,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-secondary-200 p-6 space-y-4">
+      <div className="border-t border-secondary-200 p-4 space-y-3">
         {/* Service Selector */}
         <ServiceSelector
           selectedServices={selectedServices}
@@ -104,18 +104,18 @@ const ChatMain: React.FC<ChatMainProps> = ({
         />
 
         {/* Input Form */}
-        <form onSubmit={handleSubmit} className="flex items-center gap-4">
+        <form onSubmit={handleSubmit} className="flex items-center gap-3">
           <div className="flex-1 relative">
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder={`Ask a follow-up question... ${getServiceContext()}`}
-              className="w-full px-4 py-3 pr-12 border border-secondary-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent max-h-32 text-secondary-800"
+              className="w-full px-3 py-2.5 pr-10 border border-secondary-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent max-h-24 text-sm text-secondary-800"
               rows={1}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement;
                 target.style.height = 'auto';
-                target.style.height = Math.min(target.scrollHeight, 128) + 'px';
+                target.style.height = Math.min(target.scrollHeight, 96) + 'px';
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -128,22 +128,22 @@ const ChatMain: React.FC<ChatMainProps> = ({
             <button
               type="button"
               onClick={handleVoiceInput}
-              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-2 rounded-lg transition-all duration-200 ${
+              className={`absolute right-2.5 top-1/2 transform -translate-y-1/2 p-1.5 rounded-lg transition-all duration-200 ${
                 isListening 
                   ? 'bg-red-100 text-red-600 animate-pulse' 
                   : 'text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100'
               }`}
             >
-              <Mic className="w-4 h-4" />
+              <Mic className="w-3.5 h-3.5" />
             </button>
           </div>
           
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="p-3 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-md hover:shadow-lg"
+            className="p-2.5 bg-primary-600 text-white rounded-xl hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </button>
         </form>
       </div>

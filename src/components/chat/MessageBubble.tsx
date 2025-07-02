@@ -79,9 +79,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
       return (
         <div
           key={serviceId}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${service.color}`}
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${service.color}`}
         >
-          <IconComponent className="w-3 h-3" />
+          <IconComponent className="w-2.5 h-2.5" />
           <span>{service.name}</span>
         </div>
       );
@@ -91,27 +91,27 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
   if (message.isUser) {
     return (
       <div className="flex justify-end">
-        <div className="max-w-2xl">
-          <div className="flex items-start gap-3 justify-end">
+        <div className="max-w-xl">
+          <div className="flex items-start gap-2 justify-end">
             <div className="flex-1">
               {/* Service badges for user messages */}
               {message.services && message.services.length > 0 && (
-                <div className="flex flex-wrap gap-2 justify-end mb-2">
+                <div className="flex flex-wrap gap-1.5 justify-end mb-1.5">
                   {getServiceBadges()}
                 </div>
               )}
               
-              <div className="bg-primary-600 text-white p-4 rounded-2xl rounded-tr-md shadow-sm">
-                <p className="whitespace-pre-wrap">{displayedContent}</p>
+              <div className="bg-primary-600 text-white p-3 rounded-xl rounded-tr-md shadow-sm">
+                <p className="whitespace-pre-wrap text-sm">{displayedContent}</p>
               </div>
-              <div className="flex justify-end mt-2">
+              <div className="flex justify-end mt-1">
                 <span className="text-xs text-secondary-500">
                   {formatTime(message.timestamp)}
                 </span>
               </div>
             </div>
-            <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-4 h-4 text-white" />
+            <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-3 h-3 text-white" />
             </div>
           </div>
         </div>
@@ -121,84 +121,84 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
 
   return (
     <div className="flex justify-start">
-      <div className="max-w-4xl w-full">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
-            <Bot className="w-4 h-4 text-white" />
+      <div className="max-w-3xl w-full">
+        <div className="flex items-start gap-2">
+          <div className="w-6 h-6 bg-primary-600 rounded-full flex items-center justify-center flex-shrink-0">
+            <Bot className="w-3 h-3 text-white" />
           </div>
           
           <div className="flex-1">
             {/* Service context indicator */}
             {message.services && message.services.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
+              <div className="flex flex-wrap gap-1.5 mb-1.5">
                 <div className="text-xs text-secondary-500 font-medium">
-                  Response contextualized for:
+                  Response for:
                 </div>
                 {getServiceBadges()}
               </div>
             )}
             
-            <div className="bg-secondary-50 p-4 rounded-2xl rounded-tl-md shadow-sm">
-              <p className="whitespace-pre-wrap text-secondary-800">
+            <div className="bg-secondary-50 p-3 rounded-xl rounded-tl-md shadow-sm">
+              <p className="whitespace-pre-wrap text-secondary-800 text-sm leading-relaxed">
                 {displayedContent}
                 {isTyping && <span className="animate-pulse">|</span>}
               </p>
             </div>
             
-            <div className="flex items-center justify-between mt-2">
+            <div className="flex items-center justify-between mt-1">
               <span className="text-xs text-secondary-500">
                 {formatTime(message.timestamp)}
               </span>
               
               {!isTyping && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <button
                     onClick={handleCopy}
-                    className="p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
+                    className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
                     title="Copy to clipboard"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3.5 h-3.5" />
                   </button>
                   
                   <button
                     onClick={toggleSources}
-                    className="p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
+                    className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
                     title="Sources & References"
                   >
-                    <FileText className="w-4 h-4" />
+                    <FileText className="w-3.5 h-3.5" />
                   </button>
                   
                   <button
                     onClick={handleShare}
-                    className="p-2 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
+                    className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
                     title="Share"
                   >
-                    <Share className="w-4 h-4" />
+                    <Share className="w-3.5 h-3.5" />
                   </button>
                   
-                  <div className="flex items-center gap-1 ml-2">
+                  <div className="flex items-center gap-0.5 ml-1">
                     <button
                       onClick={() => handleFeedback('up')}
-                      className={`p-2 rounded-lg transition-colors ${
+                      className={`p-1.5 rounded-lg transition-colors ${
                         feedback === 'up'
                           ? 'text-green-600 bg-green-100'
                           : 'text-secondary-500 hover:text-green-600 hover:bg-green-50'
                       }`}
                       title="Helpful"
                     >
-                      <ThumbsUp className="w-4 h-4" />
+                      <ThumbsUp className="w-3.5 h-3.5" />
                     </button>
                     
                     <button
                       onClick={() => handleFeedback('down')}
-                      className={`p-2 rounded-lg transition-colors ${
+                      className={`p-1.5 rounded-lg transition-colors ${
                         feedback === 'down'
                           ? 'text-red-600 bg-red-100'
                           : 'text-secondary-500 hover:text-red-600 hover:bg-red-50'
                       }`}
                       title="Not helpful"
                     >
-                      <ThumbsDown className="w-4 h-4" />
+                      <ThumbsDown className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
