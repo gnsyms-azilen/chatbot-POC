@@ -30,7 +30,7 @@ const SourcesSidebar: React.FC<SourcesSidebarProps> = ({ sources, toggleSources 
   };
 
   return (
-    <div className="w-72 bg-white border-l border-secondary-200 flex flex-col h-full max-md:hidden">
+    <div className="w-72 bg-white border-l border-secondary-200 flex flex-col h-full">
       {/* Header */}
       <div className="flex gap-3 p-4 border-b border-secondary-200">
         <div>
