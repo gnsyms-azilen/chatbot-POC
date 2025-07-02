@@ -3,7 +3,7 @@ import LandingPage from './components/LandingPage';
 import ChatInterface from './components/ChatInterface';
 
 function App() {
-  const [currentView, setCurrentView] = useState<'landing' | 'chat'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'chat'>('chat');
   const [initialQuery, setInitialQuery] = useState<string>('');
 
   const handleStartChat = (query: string) => {

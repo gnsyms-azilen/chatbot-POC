@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatHeader from './chat/ChatHeader';
 import ChatSidebar from './chat/ChatSidebar';
 import ChatMain from './chat/ChatMain';
@@ -114,19 +114,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     { id: '4', title: 'Business Expenses', timestamp: new Date('2023-12-20'), category: '2023 Tax Year' },
   ];
 
+  const toggleHistory = useCallback(() => {
+    setIsMobileMenuOpen(prev => !prev);
+  }, []);
+  
   return (
     <div className="h-screen flex flex-col bg-secondary-50">
       <ChatHeader 
         currentTopic={currentTopic}
         onNewChat={handleNewChat}
-        onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        onMobileMenuToggle={toggleHistory}
       />
       
       <div className="flex-1 flex overflow-hidden">
         <ChatSidebar 
           chatHistory={mockChatHistory}
           isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
+          onClose={toggleHistory}
         />
         
         <div className="flex-1 flex">
