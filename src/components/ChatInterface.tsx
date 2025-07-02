@@ -3,7 +3,7 @@ import ChatHeader from './chat/ChatHeader';
 import ChatSidebar from './chat/ChatSidebar';
 import ChatMain from './chat/ChatMain';
 import SourcesSidebar from './chat/SourcesSidebar';
-import { SERVICES } from './chat/ServiceFilter';
+import { SERVICES } from './chat/ServiceModal';
 
 interface Message {
   id: string;

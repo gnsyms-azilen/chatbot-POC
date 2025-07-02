@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { Send, Mic } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import LoadingDots from './LoadingDots';
-import ServiceFilter, { SERVICES } from './ServiceFilter';
+import ServiceSelector from './ServiceSelector';
+import { SERVICES } from './ServiceModal';
 
 interface Message {
   id: string;
@@ -96,8 +97,8 @@ const ChatMain: React.FC<ChatMainProps> = ({
 
       {/* Input Area */}
       <div className="border-t border-secondary-200 p-6 space-y-4">
-        {/* Service Filter */}
-        <ServiceFilter
+        {/* Service Selector */}
+        <ServiceSelector
           selectedServices={selectedServices}
           onServicesChange={setSelectedServices}
         />

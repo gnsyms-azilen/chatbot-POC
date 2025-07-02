@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Copy, FileText, Share, ThumbsUp, ThumbsDown, User, Bot } from 'lucide-react';
-import { SERVICES } from './ServiceFilter';
+import { SERVICES } from './ServiceModal';
 
 interface Message {
   id: string;
@@ -79,7 +79,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
       return (
         <div
           key={serviceId}
-          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium border ${service.color}`}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${service.color}`}
         >
           <IconComponent className="w-3 h-3" />
           <span>{service.name}</span>

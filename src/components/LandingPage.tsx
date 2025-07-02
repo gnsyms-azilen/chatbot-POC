@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mic, Send, Bot } from 'lucide-react';
-import ServiceFilter from './chat/ServiceFilter';
+import ServiceSelector from './chat/ServiceSelector';
 
 interface LandingPageProps {
   onStartChat: (query: string, services?: string[]) => void;
@@ -64,12 +64,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onStartChat }) => {
         </div>
 
         {/* Search Interface */}
-        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto mb-8 space-y-4">
-          {/* Service Filter */}
-          <ServiceFilter
-            selectedServices={selectedServices}
-            onServicesChange={setSelectedServices}
-          />
+        <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto mb-8 space-y-6">
+          {/* Service Selector */}
+          <div className="flex justify-center">
+            <ServiceSelector
+              selectedServices={selectedServices}
+              onServicesChange={setSelectedServices}
+            />
+          </div>
 
           {/* Query Input */}
           <div className={`relative group transition-all duration-300 ${
