@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Send, Mic } from 'lucide-react';
+import { Send, Mic, Filter, X } from 'lucide-react';
 import MessageBubble from './MessageBubble';
 import LoadingDots from './LoadingDots';
-import ServiceSelector from './ServiceSelector';
-import { SERVICES } from './ServiceModal';
+import ServiceModal, { SERVICES } from './ServiceModal';
 
 interface Message {
   id: string;
@@ -36,6 +35,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +59,46 @@ const ChatMain: React.FC<ChatMainProps> = ({
     }).filter(Boolean);
 
     if (serviceNames.length === 1) {
-      return `(${serviceNames[0]} specific)`;
+      return ` (${serviceNames[0]} specific)`;
     } else if (serviceNames.length > 1) {
-      return `(${serviceNames.join(', ')} specific)`;
+      return ` (${serviceNames.join(', ')} specific)`;
     }
     return '';
+  };
+
+  const getSelectedServicesDisplay = () => {
+    if (selectedServices.length === 0) return null;
+    
+    return selectedServices.map(serviceId => {
+      const service = SERVICES.find(s => s.id === serviceId);
+      if (!service) return null;
+      
+      const IconComponent = service.icon;
+      return (
+        <div
+          key={serviceId}
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${service.color} transition-all duration-200`}
+        >
+          <IconComponent className="w-3 h-3" />
+          <span>{service.name}</span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const newSelected = selectedServices.filter(id => id !== serviceId);
+              setSelectedServices(newSelected);
+            }}
+            className="ml-0.5 hover:bg-black hover:bg-opacity-10 rounded-full p-0.5 transition-colors"
+            aria-label={`Remove ${service.name}`}
+          >
+            <X className="w-2.5 h-2.5" />
+          </button>
+        </div>
+      );
+    });
+  };
+
+  const handleClearAllServices = () => {
+    setSelectedServices([]);
   };
 
   return (
@@ -97,11 +132,19 @@ const ChatMain: React.FC<ChatMainProps> = ({
 
       {/* Input Area */}
       <div className="border-t border-secondary-200 p-4 space-y-3">
-        {/* Service Selector */}
-        <ServiceSelector
-          selectedServices={selectedServices}
-          onServicesChange={setSelectedServices}
-        />
+        {/* Selected Services Display */}
+        {selectedServices.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {getSelectedServicesDisplay()}
+            <button
+              onClick={handleClearAllServices}
+              className="inline-flex items-center gap-0.5 px-2 py-0.5 text-xs font-medium text-secondary-600 hover:text-secondary-800 hover:bg-secondary-100 rounded-full transition-colors"
+            >
+              <X className="w-2.5 h-2.5" />
+              Clear All
+            </button>
+          </div>
+        )}
 
         {/* Input Form */}
         <form onSubmit={handleSubmit} className="flex items-center gap-3">
@@ -109,8 +152,8 @@ const ChatMain: React.FC<ChatMainProps> = ({
             <textarea
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={`Ask a follow-up question... ${getServiceContext()}`}
-              className="w-full px-3 py-2.5 pr-10 border border-secondary-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent max-h-24 text-sm text-secondary-800"
+              placeholder={`Ask a follow-up question...${getServiceContext()}`}
+              className="w-full px-3 py-2.5 pr-20 border border-secondary-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent max-h-24 text-sm text-secondary-800"
               rows={1}
               onInput={(e) => {
                 const target = e.target as HTMLTextAreaElement;
@@ -125,6 +168,21 @@ const ChatMain: React.FC<ChatMainProps> = ({
               }}
             />
             
+            {/* Service Selector Button */}
+            <button
+              type="button"
+              onClick={() => setIsServiceModalOpen(true)}
+              className={`absolute right-10 top-1/2 transform -translate-y-1/2 p-1.5 rounded-lg transition-all duration-200 ${
+                selectedServices.length > 0
+                  ? 'bg-primary-100 text-primary-600'
+                  : 'text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100'
+              }`}
+              title="Select service type"
+            >
+              <Filter className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Voice Input Button */}
             <button
               type="button"
               onClick={handleVoiceInput}
@@ -133,6 +191,7 @@ const ChatMain: React.FC<ChatMainProps> = ({
                   ? 'bg-red-100 text-red-600 animate-pulse' 
                   : 'text-secondary-400 hover:text-secondary-600 hover:bg-secondary-100'
               }`}
+              title="Voice input"
             >
               <Mic className="w-3.5 h-3.5" />
             </button>
@@ -146,6 +205,14 @@ const ChatMain: React.FC<ChatMainProps> = ({
             <Send className="w-4 h-4" />
           </button>
         </form>
+
+        {/* Service Modal */}
+        <ServiceModal
+          isOpen={isServiceModalOpen}
+          onClose={() => setIsServiceModalOpen(false)}
+          selectedServices={selectedServices}
+          onServicesChange={setSelectedServices}
+        />
       </div>
     </div>
   );

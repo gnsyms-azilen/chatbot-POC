@@ -135,7 +135,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ initialQuery, onBackToLan
     setMessages([]);
     setCurrentTopic('Tax Questions');
     setHasProcessedInitialQuery(false);
-    onBackToLanding();
+    // Don't navigate back to landing page - stay in chat interface
   };
 
   const mockChatHistory = [
