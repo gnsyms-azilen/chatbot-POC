@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Download, ThumbsUp, ThumbsDown, User, Bot } from 'lucide-react';
+import { Copy, Download, ThumbsUp, ThumbsDown, User, Bot,FileText } from 'lucide-react';
 import { SERVICES } from './ServiceModal';
 import { generateConversationPDF } from '../../utils/pdfGenerator';
 
@@ -167,7 +167,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, a
                     className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
                     title="Sources & References"
                   >
-                    <Download className="w-3.5 h-3.5" />
+                    <FileText className="w-3.5 h-3.5" />
                   </button>
                   
                   <button
