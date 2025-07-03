@@ -122,7 +122,12 @@ const ChatMain: React.FC<ChatMainProps> = ({
         )}
 
         {messages.map((message) => (
-          <MessageBubble key={message.id} message={message} toggleSources={toggleSources} />
+          <MessageBubble 
+            key={message.id} 
+            message={message} 
+            toggleSources={toggleSources}
+            allMessages={messages}
+          />
         ))}
 
         {isLoading && <LoadingDots />}

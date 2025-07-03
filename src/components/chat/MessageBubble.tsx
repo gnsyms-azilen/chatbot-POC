@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, FileText, Share, ThumbsUp, ThumbsDown, User, Bot } from 'lucide-react';
+import { Copy, Download, ThumbsUp, ThumbsDown, User, Bot } from 'lucide-react';
 import { SERVICES } from './ServiceModal';
+import { generateConversationPDF } from '../../utils/pdfGenerator';
 
 interface Message {
   id: string;
@@ -18,9 +19,10 @@ interface Message {
 interface MessageBubbleProps {
   message: Message;
   toggleSources: () => void;
+  allMessages: Message[];
 }
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, allMessages }) => {
   const [displayedContent, setDisplayedContent] = useState('');
   const [isTyping, setIsTyping] = useState(!message.isUser);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
@@ -32,17 +34,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
       return;
     }
 
-    // Typing animation for bot messages
-    let index = 0;
+    // Word-by-word animation for bot messages
+    const words = message.content.split(' ');
+    let wordIndex = 0;
+    
     const interval = setInterval(() => {
-      if (index < message.content.length) {
-        setDisplayedContent(message.content.slice(0, index + 1));
-        index++;
+      if (wordIndex < words.length) {
+        setDisplayedContent(words.slice(0, wordIndex + 1).join(' '));
+        wordIndex++;
       } else {
         setIsTyping(false);
         clearInterval(interval);
       }
-    }, 30);
+    }, 150); // 150ms delay between words for natural reading pace
 
     return () => clearInterval(interval);
   }, [message.content, message.isUser]);
@@ -51,13 +55,11 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
     navigator.clipboard.writeText(message.content);
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'TaxBot Response',
-        text: message.content,
-      });
-    }
+  const handleDownloadPDF = () => {
+    // Find the conversation up to this message
+    const messageIndex = allMessages.findIndex(m => m.id === message.id);
+    const conversationUpToHere = allMessages.slice(0, messageIndex + 1);
+    generateConversationPDF(conversationUpToHere);
   };
 
   const handleFeedback = (type: 'up' | 'down') => {
@@ -141,7 +143,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
             <div className="bg-secondary-50 p-3 rounded-xl rounded-tl-md shadow-sm">
               <p className="whitespace-pre-wrap text-secondary-800 text-sm leading-relaxed">
                 {displayedContent}
-                {isTyping && <span className="animate-pulse">|</span>}
+                {isTyping && <span className="animate-pulse ml-1">|</span>}
               </p>
             </div>
             
@@ -165,15 +167,15 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources })
                     className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
                     title="Sources & References"
                   >
-                    <FileText className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5" />
                   </button>
                   
                   <button
-                    onClick={handleShare}
+                    onClick={handleDownloadPDF}
                     className="p-1.5 text-secondary-500 hover:text-secondary-700 hover:bg-secondary-100 rounded-lg transition-colors"
-                    title="Share"
+                    title="Download conversation as PDF"
                   >
-                    <Share className="w-3.5 h-3.5" />
+                    <Download className="w-3.5 h-3.5" />
                   </button>
                   
                   <div className="flex items-center gap-0.5 ml-1">
