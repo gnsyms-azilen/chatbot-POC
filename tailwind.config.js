@@ -42,6 +42,7 @@ export default {
         'pulse-dot': 'pulse-dot 1.4s ease-in-out infinite',
         'typing': 'typing 0.05s steps(1) infinite',
         'glow': 'glow 2s ease-in-out infinite alternate',
+        'word-fade-in': 'word-fade-in 0.4s ease-out forwards',
       },
       keyframes: {
         'pulse-dot': {
@@ -55,6 +56,18 @@ export default {
         'glow': {
           'from': { boxShadow: '0 0 20px -10px rgba(43, 107, 230, 0.5)' },
           'to': { boxShadow: '0 0 20px -5px rgba(43, 107, 230, 0.8)' },
+        },
+        'word-fade-in': {
+          '0%': { 
+            opacity: '0', 
+            transform: 'translateY(4px)',
+            filter: 'blur(1px)'
+          },
+          '100%': { 
+            opacity: '1', 
+            transform: 'translateY(0)',
+            filter: 'blur(0px)'
+          },
         },
       },
     },

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Copy, Download, ThumbsUp, ThumbsDown, User, Bot,FileText } from 'lucide-react';
+import { Copy, Download, ThumbsUp, ThumbsDown, User, Bot, FileText } from 'lucide-react';
 import { SERVICES } from './ServiceModal';
 import { generateConversationPDF } from '../../utils/pdfGenerator';
 
@@ -23,30 +23,52 @@ interface MessageBubbleProps {
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, allMessages }) => {
-  const [displayedContent, setDisplayedContent] = useState('');
+  const [animatedTokens, setAnimatedTokens] = useState<string[]>([]);
   const [isTyping, setIsTyping] = useState(!message.isUser);
   const [feedback, setFeedback] = useState<'up' | 'down' | null>(null);
 
+  // Helper function to tokenize content into words and preserve formatting
+  const tokenizeContent = (content: string): string[] => {
+    const tokens: string[] = [];
+    const lines = content.split('\n');
+    
+    lines.forEach((line, lineIndex) => {
+      if (lineIndex > 0) {
+        tokens.push('\n'); // Add newline token
+      }
+      
+      const words = line.split(' ').filter(word => word.length > 0);
+      words.forEach((word, wordIndex) => {
+        tokens.push(word);
+        if (wordIndex < words.length - 1) {
+          tokens.push(' '); // Add space token
+        }
+      });
+    });
+    
+    return tokens;
+  };
+
   useEffect(() => {
     if (message.isUser) {
-      setDisplayedContent(message.content);
+      setAnimatedTokens(tokenizeContent(message.content));
       setIsTyping(false);
       return;
     }
 
     // Word-by-word animation for bot messages
-    const words = message.content.split(' ');
-    let wordIndex = 0;
+    const tokens = tokenizeContent(message.content);
+    let tokenIndex = 0;
     
     const interval = setInterval(() => {
-      if (wordIndex < words.length) {
-        setDisplayedContent(words.slice(0, wordIndex + 1).join(' '));
-        wordIndex++;
+      if (tokenIndex < tokens.length) {
+        setAnimatedTokens(prev => [...prev, tokens[tokenIndex]]);
+        tokenIndex++;
       } else {
         setIsTyping(false);
         clearInterval(interval);
       }
-    }, 150); // 150ms delay between words for natural reading pace
+    }, 70); // 70ms delay between tokens for natural reading pace
 
     return () => clearInterval(interval);
   }, [message.content, message.isUser]);
@@ -90,6 +112,31 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, a
     });
   };
 
+  const renderAnimatedContent = () => {
+    return animatedTokens.map((token, index) => {
+      if (token === '\n') {
+        return <br key={index} />;
+      }
+      
+      if (token === ' ') {
+        return <span key={index}>&nbsp;</span>;
+      }
+      
+      return (
+        <span
+          key={index}
+          className="animate-word-fade-in inline-block"
+          style={{
+            animationDelay: `${index * 0.05}s`,
+            animationFillMode: 'both'
+          }}
+        >
+          {token}
+        </span>
+      );
+    });
+  };
+
   if (message.isUser) {
     return (
       <div className="flex justify-end">
@@ -104,7 +151,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, a
               )}
               
               <div className="bg-primary-600 text-white p-3 rounded-xl rounded-tr-md shadow-sm">
-                <p className="whitespace-pre-wrap text-sm">{displayedContent}</p>
+                <p className="whitespace-pre-wrap text-sm">{message.content}</p>
               </div>
               <div className="flex justify-end mt-1">
                 <span className="text-xs text-secondary-500">
@@ -141,10 +188,10 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message, toggleSources, a
             )}
             
             <div className="bg-secondary-50 p-3 rounded-xl rounded-tl-md shadow-sm">
-              <p className="whitespace-pre-wrap text-secondary-800 text-sm leading-relaxed">
-                {displayedContent}
+              <div className="whitespace-pre-wrap text-secondary-800 text-sm leading-relaxed">
+                {renderAnimatedContent()}
                 {isTyping && <span className="animate-pulse ml-1">|</span>}
-              </p>
+              </div>
             </div>
             
             <div className="flex items-center justify-between mt-1">
